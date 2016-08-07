@@ -1,6 +1,5 @@
 #include "Platform.h"
 #include "Game.h"
-#include "Hotload.h"
 
 //General includes
 #include <Windows.h>
@@ -42,53 +41,7 @@ GLuint windowHeight = 768;
 
 userInput inputs;
 
-HMODULE hotloadDLL;
-hotload_function* hotloadFunction;
-
 CroneGame* game;
-
-//In order for this to work, you MUST add the temp .pdb file to the linker options in the Game.dll project
-//Also, NATIVE edit and continue must be enabled (Tools->Options->Debugging->Edit and Continue->Enable native...
-#define ALLOW_GAME_HOTLOADING 1
-#if ALLOW_GAME_HOTLOADING
-FILETIME lastDLLWriteTime;
-FILETIME lastPDBWriteTime;
-inline FILETIME Win32GetLastWriteTime(char* Filename){
-	FILETIME LastWriteTime = {};
-
-	WIN32_FIND_DATA FindData;
-	HANDLE FindHandle = FindFirstFileA(Filename, &FindData);
-
-	if (FindHandle != INVALID_HANDLE_VALUE){
-		LastWriteTime = FindData.ftLastWriteTime;
-		FindClose(FindHandle);
-	}
-
-	return LastWriteTime;
-}
-#endif
-
-void loadGameCode(){
-	hotloadDLL = NULL;
-	hotloadFunction = nullptr;
-
-	CopyFile(HOTLOAD_LOC".pdb", HOTLOAD_LOC"_tmp.pdb", FALSE);
-	#if ALLOW_GAME_HOTLOADING
-	lastDLLWriteTime = Win32GetLastWriteTime(HOTLOAD_LOC".dll");
-	lastPDBWriteTime = Win32GetLastWriteTime(HOTLOAD_LOC".pdb");
-	CopyFile(HOTLOAD_LOC".dll", HOTLOAD_LOC"_tmp.dll", FALSE);
-	hotloadDLL = LoadLibraryA(HOTLOAD_LOC"_tmp.dll");
-	#else
-	hotloadDLL = LoadLibraryA(HOTLOAD_LOC".dll");
-	#endif
-
-	if (hotloadDLL){
-		hotloadFunction = (hotload_function*)GetProcAddress(hotloadDLL, "hotloadFunction");
-	}
-	if (!hotloadFunction){
-		hotloadFunction = hotloadFunctionStub;
-	}
-}
 
 int main(){
 	try{
@@ -97,8 +50,6 @@ int main(){
 	catch (ErrorCondition e){
 		return e;
 	}
-
-	loadGameCode();
 
 	game = new CroneGame();
 
@@ -111,18 +62,6 @@ int main(){
 		GLfloat currentFrame = (GLfloat)glfwGetTime();
 		GLfloat deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-
-		//conditionally reload game dll
-		#if ALLOW_GAME_HOTLOADING
-		FILETIME newDLLWriteTime = Win32GetLastWriteTime(HOTLOAD_LOC".dll");
-		FILETIME newPDBWriteTime = Win32GetLastWriteTime(HOTLOAD_LOC".pdb");
-		if ((CompareFileTime(&newDLLWriteTime, &lastDLLWriteTime) != 0) && 
-			(CompareFileTime(&newPDBWriteTime, &lastPDBWriteTime) != 0))
-		{
-			if (hotloadDLL) FreeLibrary(hotloadDLL);
-			loadGameCode();
-		}
-		#endif
 
 		//print dT in ms to console
 		//cout << deltaTime*1000 << endl;
@@ -138,9 +77,9 @@ int main(){
 	}
 
 	cleanUpAndClose();
+
 	//wait before closing console window
 	//char tmp = getchar();
-
 	return NO_ERROR;
 }
 

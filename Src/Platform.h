@@ -9,7 +9,7 @@
 
 //GLEW - OpenGL Extension Wrangler
 #define GLEW_STATIC
-#include <GL/glew.h>
+#include <GLEW/glew.h>
 
 #include<string>
 
@@ -18,7 +18,6 @@
 #define CRONE_DIR_SCREENSHOTS "Screenshots"
 #define CRONE_DIR_SHADERS "Shaders"
 #define CRONE_DIR_TEXTURES "Assets/Textures"
-#define HOTLOAD_LOC "Hotload/Hotload"
 
 enum ErrorCondition {
 	NO_ERROR, 

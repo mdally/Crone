@@ -53,7 +53,7 @@ CroneGame::CroneGame(){
 		}
 	}
 
-	terrainFloor = Shader("terrainFloor.vert", NULL, "terrainFloor.frag");
+	terrainFloor = Shader("terrainFloor.vert", nullptr, "terrainFloor.frag");
 
 	glGenVertexArrays(1, &VAO);
 
@@ -93,7 +93,7 @@ void CroneGame::render(){
 
 	mat4 model; //identity
 	//mat4 view = glm::lookAt(vec3(0.0f, 20.0f, 20.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	mat4 projection = glm::perspective(cam.fov, windowWidth/(GLfloat)windowHeight, 0.1f, 100.0f);
+	mat4 projection = glm::perspective(cam.fov, windowWidth/(GLfloat)windowHeight, 0.1f, 100000.0f);
 
 	GLuint modelLoc = glGetUniformLocation(terrainFloor.programHandle, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));

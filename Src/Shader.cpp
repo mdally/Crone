@@ -15,8 +15,8 @@ Shader::Shader(char* vertFileName, char* geometryFileName, char* fragFileName){
 			geomShader = compileShaderFile(GL_GEOMETRY_SHADER, geometryFileName);
 		fragShader = compileShaderFile(GL_FRAGMENT_SHADER, fragFileName);
 	}
-	catch (ErrorCondition){
-		throw;
+	catch (ErrorCondition e){
+		throw e;
 	}
 
 	//link the shaders
