@@ -181,7 +181,7 @@ void setupResources(){
 	//set up debug output
 	time_t currentTime = time(0);
 	struct tm* now = localtime(&currentTime);
-	char debugFileName[30];
+	char debugFileName[100];
 	sprintf(
 		debugFileName, 
 		"%s/%d-%02d-%02d-%02d-%02d-%02d.txt",

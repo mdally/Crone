@@ -3,6 +3,8 @@
 
 #include "Platform.h"
 
+const float minMoveSpeed = 5.0f;
+const float minScrollSpeed = 1.0f;
 
 class Camera{
 	public:
@@ -12,6 +14,7 @@ class Camera{
 
 		GLfloat moveSpeed;		// meters/second
 		GLfloat rotateSpeed;	// radians/second
+		GLfloat scrollSpeed;
 
 		glm::vec3 atPos;
 		glm::vec3 look;

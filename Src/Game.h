@@ -3,6 +3,7 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "WorldMap.h"
 
 #define chunkDimension 32	//tiles per chunk side
 #define tileDimension 2		//meters per tile side
@@ -19,9 +20,7 @@ public:
 	void update(userInput* inputs, GLfloat dT);
 	void render();
 private:
-	GLuint chunk[chunkDimension][chunkDimension];
-	GLfloat chunkVerts[vertsPerTile*floatsPerVert*chunkDimension*chunkDimension];
-	GLuint chunkVertIndices[trisPerTile*idxsPerTri*chunkDimension*chunkDimension];
+	WorldMap map;
 	
 	GLuint VAO, VBO, EBO;
 

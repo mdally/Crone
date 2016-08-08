@@ -4,17 +4,6 @@
 using glm::vec3;
 using glm::mat4;
 
-GLuint stdTileVertIndices[trisPerTile*idxsPerTri] = {
-	4, 1, 0,
-	4, 2, 1,
-	4, 5, 2,
-	4, 8, 5,
-	4, 7, 8,
-	4, 6, 7,
-	4, 3, 6,
-	4, 0, 3
-};
-
 CroneGame::CroneGame(){
 	windowWidth = 1024;
 	windowHeight = 768;
@@ -26,32 +15,10 @@ CroneGame::CroneGame(){
 
 	//wireframe
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//filled
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	for (int z = 0; z < chunkDimension; ++z){
-		for (int x = 0; x < chunkDimension; ++x){
-			chunk[z][x] = 0;
-		}
-	}
-
-	GLfloat* ptr = chunkVerts;
-	for (int z = 0; z < chunkDimension; ++z){
-		for (int x = 0; x < chunkDimension; ++x){
-			for (int row = 0; row < 3; ++row){
-				for (int col = 0; col < 3; ++col){
-					*ptr++ = (GLfloat)(tileDimension * x + col);
-					*ptr++ = (GLfloat)(chunk[z][x]);
-					*ptr++ = -(GLfloat)(tileDimension * z + row);
-				}
-			}
-		}
-	}
-
-	for (int tileNum = 0; tileNum < chunkDimension*chunkDimension; ++tileNum){
-		for (int tileVertIdx = 0; tileVertIdx < trisPerTile*idxsPerTri; ++tileVertIdx){
-			chunkVertIndices[trisPerTile * idxsPerTri * tileNum + tileVertIdx] = 
-				vertsPerTile * tileNum + stdTileVertIndices[tileVertIdx];
-		}
-	}
+	map.generate(5);
 
 	terrainFloor = Shader("terrainFloor.vert", nullptr, "terrainFloor.frag");
 
@@ -63,13 +30,15 @@ CroneGame::CroneGame(){
 	glBindVertexArray(VAO);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(chunkVerts), chunkVerts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, map.nTerrainVerts*sizeof(GLfloat), map.terrainVerts, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(chunkVertIndices), chunkVertIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map.nTerrainVertIndices*sizeof(GLuint), map.terrainVertIndices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 

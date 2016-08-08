@@ -57,6 +57,9 @@
     <ClInclude Include="..\..\Src\Voronoi\VoronoiDiagramGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\WorldMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\Camera.cpp">
@@ -95,5 +98,22 @@
     <ClCompile Include="..\..\Src\Voronoi\VoronoiDiagramGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\WorldMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Shaders\simple.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\Shaders\simple.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\Shaders\terrainFloor.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\Shaders\terrainFloor.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Src\Camera.h" />
     <ClInclude Include="..\..\Src\Game.h" />
+    <ClInclude Include="..\..\Src\WorldMap.h" />
     <ClInclude Include="..\..\Src\Platform.h" />
     <ClInclude Include="..\..\Src\Shader.h" />
     <ClInclude Include="..\..\Src\Voronoi\BeachLine.h" />
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Src\Camera.cpp" />
     <ClCompile Include="..\..\Src\Game.cpp" />
+    <ClCompile Include="..\..\Src\WorldMap.cpp" />
     <ClCompile Include="..\..\Src\Platform.cpp" />
     <ClCompile Include="..\..\Src\Shader.cpp" />
     <ClCompile Include="..\..\Src\Voronoi\BeachLine.cpp" />
@@ -156,6 +158,12 @@
     <ClCompile Include="..\..\Src\Voronoi\Point2.cpp" />
     <ClCompile Include="..\..\Src\Voronoi\Vector2.cpp" />
     <ClCompile Include="..\..\Src\Voronoi\VoronoiDiagramGenerator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Shaders\simple.frag" />
+    <None Include="..\..\Shaders\simple.vert" />
+    <None Include="..\..\Shaders\terrainFloor.frag" />
+    <None Include="..\..\Shaders\terrainFloor.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

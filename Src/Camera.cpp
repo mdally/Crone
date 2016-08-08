@@ -14,7 +14,8 @@ Camera::Camera(glm::vec3 At, glm::vec3 Look, glm::vec3 WorldUp){
 	worldUp = WorldUp;
 
 	fov = (GLfloat)M_PI_4;	//45 degrees
-	moveSpeed = 5.0f;
+	moveSpeed = minMoveSpeed;
+	scrollSpeed = minScrollSpeed;
 	rotateSpeed = (GLfloat)M_PI_2;	//90 degrees / second
 	minCamDist = 5.0f;
 	zoomOut = 0;
@@ -49,13 +50,30 @@ void Camera::move(userInput* inputs, GLfloat dt){
 		tmp = { right.x, 0, right.z };
 		moveDirection += glm::normalize(tmp);
 	}
+	if (inputs->keyboard[GLFW_KEY_KP_ENTER]) {
+		//reset move speed
+		moveSpeed = minMoveSpeed;
+		scrollSpeed = minScrollSpeed;
+	}
+	if (inputs->keyboard[GLFW_KEY_KP_ADD]) {
+		//increase move speed
+		moveSpeed *= 1.1f;
+		scrollSpeed *= 1.1f;
+	}
+	if (inputs->keyboard[GLFW_KEY_KP_SUBTRACT]) {
+		//decrease move speed
+		moveSpeed /= 1.1f;
+		scrollSpeed /= 1.1f;
+		if (moveSpeed < minMoveSpeed) moveSpeed = minMoveSpeed;
+		if (scrollSpeed < minScrollSpeed) scrollSpeed = minScrollSpeed;
+	}
 
 	if (moveDirection.x != 0 || moveDirection.y != 0 || moveDirection.z != 0)
 		moveDirection = glm::normalize(moveDirection);
 	atPos += dist * moveDirection;
 
 	//Scroll in & out
-	zoomOut -= inputs->scrollDY;
+	zoomOut -= scrollSpeed*inputs->scrollDY;
 	inputs->scrollDY = 0;
 	if (zoomOut < 0) zoomOut = 0;
 
