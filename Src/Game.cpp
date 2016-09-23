@@ -9,7 +9,7 @@ CroneGame::CroneGame(){
 	windowHeight = 768;
 
 	//default background color
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -30,10 +30,10 @@ CroneGame::CroneGame(){
 	glBindVertexArray(VAO);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, map.nTerrainVerts*sizeof(GLfloat), map.terrainVerts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, map.nTerrainVerts*sizeof(GLfloat)*6, map.terrainVerts, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map.nTerrainVertIndices*sizeof(GLuint), map.terrainVertIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map.nTerrainVertIndices*sizeof(GLuint)*3, map.terrainVertIndices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -74,6 +74,6 @@ void CroneGame::render(){
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, vertsPerTile*floatsPerVert*chunkDimension*chunkDimension, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, map.nTerrainVertIndices*3, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

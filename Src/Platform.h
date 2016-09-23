@@ -14,10 +14,11 @@
 #include<string>
 
 //Game directories
-#define CRONE_DIR_LOGS "Logs"
-#define CRONE_DIR_SCREENSHOTS "Screenshots"
-#define CRONE_DIR_SHADERS "Shaders"
-#define CRONE_DIR_TEXTURES "Assets/Textures"
+#define CONE_DEBUG_ROOT "E:/Projects/Crone/"
+#define CRONE_DIR_LOGS "E:/Projects/Crone/Logs"
+#define CRONE_DIR_SCREENSHOTS "E:/Projects/Crone/Screenshots"
+#define CRONE_DIR_SHADERS "E:/Projects/Crone/Shaders"
+#define CRONE_DIR_TEXTURES "E:/Projects/Crone/Assets/Textures"
 
 enum ErrorCondition {
 	NO_ERROR, 

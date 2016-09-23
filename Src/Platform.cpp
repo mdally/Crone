@@ -77,14 +77,11 @@ int main(){
 	}
 
 	cleanUpAndClose();
-
-	//wait before closing console window
-	//char tmp = getchar();
 	return NO_ERROR;
 }
 
 //Output a timestamped message to the debug log file
-void debugLog(std::string msg){
+inline void debugLog(std::string msg){
 	time_t currentTime = time(0);
 	struct tm* now = localtime(&currentTime);
 
@@ -150,7 +147,7 @@ void takeScreenshot(){
 
 	//only allow 1 screenshot per second
 	if (currentTime - lastScreenshot > 1){
-		char screenshotFileName[50];
+		char screenshotFileName[100];
 		sprintf(
 			screenshotFileName, 
 			"%s/%d-%02d-%02d-%02d-%02d-%02d.bmp",

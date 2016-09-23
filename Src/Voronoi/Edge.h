@@ -11,9 +11,12 @@ struct Edge {
 	Point2* vertA;
 	Point2* vertB;
 
-	Edge() : lSite(nullptr), rSite(nullptr), vertA(nullptr), vertB(nullptr) {};
-	Edge(Site* _lSite, Site* _rSite) : lSite(_lSite), rSite(_rSite), vertA(nullptr), vertB(nullptr) {};
-	Edge(Site* lS, Site* rS, Point2* vA, Point2* vB) : lSite(lS), rSite(rS), vertA(vA), vertB(vB) {};
+	unsigned int nNoisyVerts;
+	Point2* noisyVerts;
+
+	Edge() : lSite(nullptr), rSite(nullptr), vertA(nullptr), vertB(nullptr), nNoisyVerts(0), noisyVerts(nullptr) {};
+	Edge(Site* _lSite, Site* _rSite) : lSite(_lSite), rSite(_rSite), vertA(nullptr), vertB(nullptr), nNoisyVerts(0), noisyVerts(nullptr) {};
+	Edge(Site* lS, Site* rS, Point2* vA, Point2* vB) : lSite(lS), rSite(rS), vertA(vA), vertB(vB), nNoisyVerts(0), noisyVerts(nullptr) {};
 
 	void setStartPoint(Site* _lSite, Site* _rSite, Point2* vertex);
 	void setEndPoint(Site* _lSite, Site* _rSite, Point2* vertex);
