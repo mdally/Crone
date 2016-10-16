@@ -1,6 +1,10 @@
 #include "WorldMap.h"
 #include "Voronoi\VoronoiDiagramGenerator.h"
 #include <ctime>
+#include <utility>
+#include "DLList.h"
+#include "EarClipping.h"
+#include "Geometry.h"
 
 bool sitesOrdered(const Point2& s1, const Point2& s2) {
 	if (s1.y < s2.y)
@@ -11,7 +15,7 @@ bool sitesOrdered(const Point2& s1, const Point2& s2) {
 	return false;
 }
 
-void genRandomSites(std::vector<Point2>& sites, BoundingBox& bbox, unsigned int dimension, unsigned int numSites, unsigned int seed) {
+void genRandomSites(std::vector<Point2>& sites, BoundingBox& bbox, uint32_t dimension, uint32_t numSites, uint32_t seed) {
 	bbox = BoundingBox(0, dimension, dimension, 0);
 	std::vector<Point2> tmpSites;
 
@@ -39,16 +43,16 @@ WorldMap::~WorldMap() {
 	if (diagram) delete diagram;
 }
 
-void WorldMap::generate(unsigned int seed) {
+void WorldMap::generate(uint32_t seed) {
 	std::vector<Point2> sites;
 	BoundingBox bbox;
-	unsigned int dimension = 10000;
-	unsigned int siteCount = 30000;
+	uint32_t dimension = 5000;
+	uint32_t siteCount = 30000;
 	genRandomSites(sites, bbox, dimension, siteCount, seed);
 
 	VoronoiDiagramGenerator vdg;
 	diagram = vdg.compute(sites, bbox);
-	for (int i = 0; i < 5; ++i) {
+	for (uint32_t i = 0; i < 5; ++i) {
 		Diagram* old = diagram;
 		diagram = vdg.relax();
 		delete old;
@@ -58,95 +62,16 @@ void WorldMap::generate(unsigned int seed) {
 #if useNoisyEdges
 	genNoisyEdges();
 
-	nTerrainVerts = 0;
-	nTerrainVertIndices = 0;
+	//perform ear clipping to generate non-intersecting triangles that completely cover each cell
+	std::vector<GLfloat> verts;
+	std::vector<GLuint> idxs;
+	openGL_TriData triData = performEarClipping(diagram, dimension);
 
-	for (Cell* c : diagram->cells) {
-		for (HalfEdge* he : c->halfEdges) {
-			size_t nVerts = (he->edge->noisyVerts ? he->edge->nNoisyVerts-1 : 1);
-			nTerrainVerts += nVerts;
-			nTerrainVertIndices += nVerts;
-		}
-		++nTerrainVerts;
-	}
-	terrainVerts = (GLfloat*)malloc(sizeof(GLfloat) * nTerrainVerts * 6);
-	terrainVertIndices = (GLuint*)malloc(sizeof(GLuint) * nTerrainVertIndices * 3);
+	terrainVerts = triData.verts;
+	nTerrainVerts = triData.nVerts;
 
-	srand(0);
-	GLuint vertCount = 0;
-	GLuint vertIdxCount = 0;
-	for (Cell* c : diagram->cells) {
-		float r = rand() / (float)RAND_MAX;
-		float g = rand() / (float)RAND_MAX;
-		float b = rand() / (float)RAND_MAX;
-		bool border = false;
-		for (HalfEdge* he : c->halfEdges) {
-			if (!(he->edge->lSite && he->edge->rSite)) {
-				border = true;
-				break;
-			}
-		}
-		if (border) {
-			r = 0.0f;
-			g = 0.0f;
-			b = 1.0f;
-		}
-
-		Point2& site = c->site.p;
-
-		terrainVerts[vertCount * 6 + 0] = (float)site.x;
-		terrainVerts[vertCount * 6 + 1] = (float)0.0;
-		terrainVerts[vertCount * 6 + 2] = -((float)dimension - (float)site.y);
-		terrainVerts[vertCount * 6 + 3] = r;
-		terrainVerts[vertCount * 6 + 4] = g;
-		terrainVerts[vertCount * 6 + 5] = b;
-
-		size_t cellCenterIdx = vertCount++;
-		size_t cellVerts = 0;
-
-		for (HalfEdge* he : c->halfEdges) {
-			Point2* noisyVerts = he->edge->noisyVerts;
-			if (noisyVerts) {
-				bool reverse = *(he->startPoint()) != noisyVerts[0];
-
-				size_t nNoisyVerts = he->edge->nNoisyVerts-1;
-				for (size_t i = 0; i < nNoisyVerts; ++i) {
-					size_t idx = (reverse ? nNoisyVerts - i : i);
-					Point2& site = noisyVerts[idx];
-
-					terrainVerts[vertCount * 6 + 0] = (float)site.x;
-					terrainVerts[vertCount * 6 + 1] = (float)0.0;
-					terrainVerts[vertCount * 6 + 2] = -((float)dimension - (float)site.y);
-					terrainVerts[vertCount * 6 + 3] = r;
-					terrainVerts[vertCount * 6 + 4] = g;
-					terrainVerts[vertCount * 6 + 5] = b;
-
-					++vertCount;
-					++cellVerts;
-				}
-			}
-			else {
-				Point2& site = *(he->startPoint());
-
-				terrainVerts[vertCount * 6 + 0] = (float)site.x;
-				terrainVerts[vertCount * 6 + 1] = (float)0.0;
-				terrainVerts[vertCount * 6 + 2] = -((float)dimension - (float)site.y);
-				terrainVerts[vertCount * 6 + 3] = r;
-				terrainVerts[vertCount * 6 + 4] = g;
-				terrainVerts[vertCount * 6 + 5] = b;
-
-				++vertCount;
-				++cellVerts;
-			}
-		}
-
-		for (GLuint i = 1; i <= cellVerts; ++i) {
-			terrainVertIndices[vertIdxCount++] = cellCenterIdx;
-			terrainVertIndices[vertIdxCount++] = cellCenterIdx + i;
-			terrainVertIndices[vertIdxCount++] = cellCenterIdx + (i % cellVerts) + 1;
-		}
-	}
-
+	terrainVertIndices = triData.idxs;
+	nTerrainTris = triData.nTris;
 
 #else
 	nTerrainVerts = 0;
@@ -190,8 +115,8 @@ void WorldMap::generate(unsigned int seed) {
 			++vertCount;
 		}
 
-		GLuint nEdges = c->halfEdges.size();
-		for (GLuint i = 1; i <= nEdges; ++i) {
+		uint32_t nEdges = c->halfEdges.size();
+		for (uint32_t i = 1; i <= nEdges; ++i) {
 			terrainVertIndices[vertIdxCount++] = cellCenterIdx;
 			terrainVertIndices[vertIdxCount++] = cellCenterIdx + i;
 			terrainVertIndices[vertIdxCount++] = cellCenterIdx + (i % nEdges) + 1;
@@ -214,19 +139,32 @@ void WorldMap::genNoisyEdges() {
 
 			Point2& v0 = *e->vertA;
 			Point2& v1 = *e->vertB;
-			Point2& d0 = e->lSite->p;
-			Point2& d1 = e->rSite->p;
+			Point2 d0 = e->lSite->p;
+			Point2 d1 = e->rSite->p;
+			Point2 mid = lerp(v0, v1, 0.5);
+
+			//project the delaunay verts closer to the edge midpoint if the delaunay edge doesn't intersect the voronoi edge
+			if (!LineSegmentsIntersect(v0, v1, d0, d1)) {
+				Point2 targetVert = (d0.distanceToSquared(v0) < d0.distanceToSquared(v1) ? v0 : v1);
+				Vector2 delaunayEdge = d1 - d0;
+
+				FindLineSegmentIntersection(mid, d0, targetVert, targetVert - 0.5*delaunayEdge, d0);
+				FindLineSegmentIntersection(mid, d1, targetVert, targetVert + 0.5*delaunayEdge, d1);
+			}
 
 			double tradeoff = 0.5;
 			Point2 t = lerp(v0, d0, tradeoff);
 			Point2 q = lerp(v0, d1, tradeoff);
 			Point2 r = lerp(v1, d0, tradeoff);
 			Point2 s = lerp(v1, d1, tradeoff);
-			Point2 mid = lerp(v0, v1, 0.5);
 
 			//TODO : change this to vary based on type of border
 			// i.e. river, coastline, ocean-ocean, etc
 			double minLength = 1;
+
+			if (v0.distanceTo(v1) < minLength) {
+				continue;
+			}
 
 			//first half of path
 			path1.push_back(v0);

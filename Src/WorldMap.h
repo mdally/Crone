@@ -9,7 +9,7 @@ class WorldMap {
 		GLfloat* terrainVerts;
 		unsigned int nTerrainVerts;
 		GLuint* terrainVertIndices;
-		unsigned int nTerrainVertIndices;
+		unsigned int nTerrainTris;
 
 		WorldMap() { diagram = nullptr; };
 		~WorldMap();

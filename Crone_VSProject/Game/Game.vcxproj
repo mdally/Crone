@@ -129,7 +129,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\Camera.h" />
+    <ClInclude Include="..\..\Src\DLList.h" />
+    <ClInclude Include="..\..\Src\EarClipping.h" />
     <ClInclude Include="..\..\Src\Game.h" />
+    <ClInclude Include="..\..\Src\Geometry.h" />
     <ClInclude Include="..\..\Src\WorldMap.h" />
     <ClInclude Include="..\..\Src\Platform.h" />
     <ClInclude Include="..\..\Src\Shader.h" />
@@ -146,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\Camera.cpp" />
+    <ClCompile Include="..\..\Src\EarClipping.cpp" />
     <ClCompile Include="..\..\Src\Game.cpp" />
     <ClCompile Include="..\..\Src\WorldMap.cpp" />
     <ClCompile Include="..\..\Src\Platform.cpp" />
