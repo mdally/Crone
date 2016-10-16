@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+using namespace GEOM;
+
 Point2::Point2() : x(0), y(0) {}
 
 Point2::Point2(const Point2& p) : x(p[0]), y(p[1]) {}

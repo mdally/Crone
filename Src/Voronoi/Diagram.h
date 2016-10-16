@@ -7,36 +7,38 @@
 #include "Cell.h"
 #include <set>
 
-struct BoundingBox;
-class Diagram {
-public:
-	std::vector<Cell*> cells;
-	std::vector<Edge*> edges;
-	std::vector<Point2*> vertices;
+namespace VORONOI {
+	struct BoundingBox;
+	class Diagram {
+	public:
+		std::vector<Cell*> cells;
+		std::vector<Edge*> edges;
+		std::vector<GEOM::Point2*> vertices;
 
-	void printDiagram();
-private:
-	friend class VoronoiDiagramGenerator;
+		void printDiagram();
+	private:
+		friend class VoronoiDiagramGenerator;
 
-	std::set<Cell*> tmpCells;
-	std::set<Edge*> tmpEdges;
-	std::set<Point2*> tmpVertices;
+		std::set<Cell*> tmpCells;
+		std::set<Edge*> tmpEdges;
+		std::set<GEOM::Point2*> tmpVertices;
 
-	MemoryPool<Cell> cellPool;
-	MemoryPool<Edge> edgePool;
-	MemoryPool<HalfEdge> halfEdgePool;
-	MemoryPool<Point2> vertexPool;
+		MemoryPool<Cell> cellPool;
+		MemoryPool<Edge> edgePool;
+		MemoryPool<HalfEdge> halfEdgePool;
+		MemoryPool<GEOM::Point2> vertexPool;
 
-	Point2* createVertex(double x, double y);
-	Cell* createCell(Point2 site);
-	Edge* createEdge(Site* lSite, Site* rSite, Point2* vertA, Point2* vertB);
-	Edge* createBorderEdge(Site* lSite, Point2* vertA, Point2* vertB);
+		GEOM::Point2* createVertex(double x, double y);
+		Cell* createCell(GEOM::Point2 site);
+		Edge* createEdge(Site* lSite, Site* rSite, GEOM::Point2* vertA, GEOM::Point2* vertB);
+		Edge* createBorderEdge(Site* lSite, GEOM::Point2* vertA, GEOM::Point2* vertB);
 
-	bool connectEdge(Edge* edge, BoundingBox bbox);
-	bool clipEdge(Edge* edge, BoundingBox bbox);
-	void clipEdges(BoundingBox bbox);
-	void closeCells(BoundingBox bbox);
-	void finalize();
-};
+		bool connectEdge(Edge* edge, BoundingBox bbox);
+		bool clipEdge(Edge* edge, BoundingBox bbox);
+		void clipEdges(BoundingBox bbox);
+		void closeCells(BoundingBox bbox);
+		void finalize();
+	};
+}
 
 #endif

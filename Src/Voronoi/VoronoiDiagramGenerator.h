@@ -7,44 +7,46 @@
 #include "Diagram.h"
 #include <vector>
 
-struct BoundingBox {
-	double xL;
-	double xR;
-	double yB;
-	double yT;
+namespace VORONOI {
+	struct BoundingBox {
+		double xL;
+		double xR;
+		double yB;
+		double yT;
 
-	BoundingBox() {};
-	BoundingBox(double xmin, double xmax, double ymin, double ymax) :
-		xL(xmin), xR(xmax), yB(ymin), yT(ymax) {};
-};
+		BoundingBox() {};
+		BoundingBox(double xmin, double xmax, double ymin, double ymax) :
+			xL(xmin), xR(xmax), yB(ymin), yT(ymax) {};
+	};
 
-class VoronoiDiagramGenerator {
-public:
-	VoronoiDiagramGenerator() : circleEventQueue(nullptr), siteEventQueue(nullptr), beachLine(nullptr) {};
-	~VoronoiDiagramGenerator() {};
+	class VoronoiDiagramGenerator {
+	public:
+		VoronoiDiagramGenerator() : circleEventQueue(nullptr), siteEventQueue(nullptr), beachLine(nullptr) {};
+		~VoronoiDiagramGenerator() {};
 
-	Diagram* compute(std::vector<Point2>& sites, BoundingBox bbox);
-	Diagram* relax();
-private:
-	Diagram* diagram;
-	CircleEventQueue* circleEventQueue;
-	std::vector<Point2*>* siteEventQueue;
-	BoundingBox	boundingBox;
+		Diagram* compute(std::vector<GEOM::Point2>& sites, BoundingBox bbox);
+		Diagram* relax();
+	private:
+		Diagram* diagram;
+		CircleEventQueue* circleEventQueue;
+		std::vector<GEOM::Point2*>* siteEventQueue;
+		BoundingBox	boundingBox;
 
-	void printBeachLine();
+		void printBeachLine();
 
-	//BeachLine
-	RBTree<BeachSection>* beachLine;
-	treeNode<BeachSection>* addBeachSection(Site* site);
-	inline void detachBeachSection(treeNode<BeachSection>* section);
-	void removeBeachSection(treeNode<BeachSection>* section);
-	double leftBreakpoint(treeNode<BeachSection>* section, double directrix);
-	double rightBreakpoint(treeNode<BeachSection>* section, double directrix);
-};
+		//BeachLine
+		RBTREE::RBTree<BeachSection>* beachLine;
+		RBTREE::treeNode<BeachSection>* addBeachSection(Site* site);
+		inline void detachBeachSection(RBTREE::treeNode<BeachSection>* section);
+		void removeBeachSection(RBTREE::treeNode<BeachSection>* section);
+		double leftBreakpoint(RBTREE::treeNode<BeachSection>* section, double directrix);
+		double rightBreakpoint(RBTREE::treeNode<BeachSection>* section, double directrix);
+	};
 
-inline void VoronoiDiagramGenerator::detachBeachSection(treeNode<BeachSection>* section) {
-	circleEventQueue->removeCircleEvent(section);
-	beachLine->removeNode(section);
+	inline void VoronoiDiagramGenerator::detachBeachSection(RBTREE::treeNode<BeachSection>* section) {
+		circleEventQueue->removeCircleEvent(section);
+		beachLine->removeNode(section);
+	}
 }
 
 #endif

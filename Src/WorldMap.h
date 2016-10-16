@@ -14,13 +14,13 @@ class WorldMap {
 		WorldMap() { diagram = nullptr; };
 		~WorldMap();
 
-		void generate(unsigned int seed);
+		void generate(unsigned int seed, bool makeNoisyEdges);
 	private:
-		Diagram* diagram;
-		MemoryPool<Point2> noisyVerts;
+		VORONOI::Diagram* diagram;
+		MemoryPool<GEOM::Point2> noisyVerts;
 
 		void genNoisyEdges();
-		static void recursiveSubdivideRect(std::vector<Point2>* points, Point2& A, Point2& B, Point2& C, Point2& D, double minLength);
+		static void recursiveSubdivideRect(std::vector<GEOM::Point2>* points, GEOM::Point2& A, GEOM::Point2& B, GEOM::Point2& C, GEOM::Point2& D, double minLength);
 };
 
 #endif

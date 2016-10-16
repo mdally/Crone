@@ -18,7 +18,7 @@ CroneGame::CroneGame(){
 	//filled
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	map.generate(5);
+	map.generate(5, true);
 
 	terrainFloor = Shader("terrainFloor.vert", nullptr, "terrainFloor.frag");
 

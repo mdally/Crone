@@ -4,36 +4,38 @@
 #include "RBTree.h"
 #include "BeachLine.h"
 
-struct Site;
-struct BeachSection;
+namespace VORONOI {
+	struct Site;
+	struct BeachSection;
 
-struct CircleEvent {
-	Site* site;
-	double x;
-	double y;
-	double yCenter;
-	treeNode<BeachSection>* beachSection;
+	struct CircleEvent {
+		Site* site;
+		double x;
+		double y;
+		double yCenter;
+		RBTREE::treeNode<BeachSection>* beachSection;
 
-	CircleEvent() {};
-	~CircleEvent() {};
-	CircleEvent(Site* _site, double _x, double _y, double _yCenter, treeNode<BeachSection>* _section) {
-		site = _site;
-		x = _x;
-		y = _y;
-		yCenter = _yCenter;
-		beachSection = _section;
-	}
-};
+		CircleEvent() {};
+		~CircleEvent() {};
+		CircleEvent(Site* _site, double _x, double _y, double _yCenter, RBTREE::treeNode<BeachSection>* _section) {
+			site = _site;
+			x = _x;
+			y = _y;
+			yCenter = _yCenter;
+			beachSection = _section;
+		}
+	};
 
-struct CircleEventQueue {
-	treeNode<CircleEvent>* firstEvent;
-	RBTree<CircleEvent> eventQueue;
+	struct CircleEventQueue {
+		RBTREE::treeNode<CircleEvent>* firstEvent;
+		RBTREE::RBTree<CircleEvent> eventQueue;
 
-	CircleEventQueue() : firstEvent(nullptr) {};
-	~CircleEventQueue() {};
+		CircleEventQueue() : firstEvent(nullptr) {};
+		~CircleEventQueue() {};
 
-	void addCircleEvent(treeNode<BeachSection>* section);
-	void removeCircleEvent(treeNode<BeachSection>* section);
-};
+		void addCircleEvent(RBTREE::treeNode<BeachSection>* section);
+		void removeCircleEvent(RBTREE::treeNode<BeachSection>* section);
+	};
+}
 
 #endif

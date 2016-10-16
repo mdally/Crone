@@ -1,5 +1,7 @@
 #include "Vector2.h"
 
+using namespace GEOM;
+
 Vector2::Vector2() : x(0), y(0) {}
 
 Vector2::Vector2(const Vector2& v) : x(v[0]), y(v[1]) {}

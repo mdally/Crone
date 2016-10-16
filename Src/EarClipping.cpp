@@ -3,6 +3,10 @@
 #include <vector>
 #include <list>
 
+using namespace GEOM;
+using namespace DLLIST;
+using namespace VORONOI;
+
 typedef std::pair<Point2,Point2> lineSegment;
 
 struct PolygonVert {
@@ -54,6 +58,9 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 	GLuint* currentIdx = triData.idxs;
 
 	for (Cell* c : diagram->cells) {
+		float r, g, b;
+#define DO_OCEANS 1
+#if DO_OCEANS
 		bool ocean = (rand() / (double)RAND_MAX)>0.5;
 		for (HalfEdge* he : c->halfEdges) {
 			if (he->edge->lSite == nullptr || he->edge->rSite == nullptr) {
@@ -62,8 +69,6 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 			}
 		}
 
-
-		float r, g, b;
 		switch (ocean) {
 			case true: {
 				r = 0.0f;
@@ -74,11 +79,13 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 				r = 0.0f;
 				g = 1.0f;
 				b = 0.0f;
-				/*r = rand() / (float)RAND_MAX;
-				g = rand() / (float)RAND_MAX;
-				b = rand() / (float)RAND_MAX;*/
 			} break;
 		}
+#else
+		r = rand() / (float)RAND_MAX;
+		g = rand() / (float)RAND_MAX;
+		b = rand() / (float)RAND_MAX;
+#endif
 
 		//add all the cell's noisy verts in order to a doubly linked list
 		for (HalfEdge* he : c->halfEdges) {

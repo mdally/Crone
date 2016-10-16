@@ -7,6 +7,10 @@
 #include <forward_list>
 #include <limits>
 
+using namespace GEOM;
+using namespace RBTREE;
+using namespace VORONOI;
+
 treeNode<BeachSection>* VoronoiDiagramGenerator::addBeachSection(Site* site) {
 	double x = site->p.x;
 	double directrix = site->p.y;

@@ -2,6 +2,10 @@
 #include "CircleEventQueue.h"
 #include "Cell.h"
 
+using namespace RBTREE;
+using namespace VORONOI;
+using namespace GEOM;
+
 void CircleEventQueue::addCircleEvent(treeNode<BeachSection>* section) {
 	if (!section) return;
 	treeNode<BeachSection>* lSection = section->prev;

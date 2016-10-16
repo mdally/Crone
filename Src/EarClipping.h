@@ -15,4 +15,4 @@ struct openGL_TriData {
 	openGL_TriData() : verts(nullptr), nVerts(0), idxs(nullptr), nTris(0) {};
 };
 
-openGL_TriData performEarClipping(Diagram* diagram, int dimension);
+openGL_TriData performEarClipping(VORONOI::Diagram* diagram, int dimension);

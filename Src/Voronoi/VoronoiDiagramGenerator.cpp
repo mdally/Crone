@@ -7,6 +7,10 @@ using std::cout;
 using std::cin;
 using std::endl;
 
+using namespace RBTREE;
+using namespace VORONOI;
+using namespace GEOM;
+
 void VoronoiDiagramGenerator::printBeachLine() {
 	treeNode<BeachSection>* section = beachLine->getFirst(beachLine->getRoot());
 

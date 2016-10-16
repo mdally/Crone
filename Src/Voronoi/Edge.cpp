@@ -2,6 +2,9 @@
 #include "Cell.h"
 #include <cmath>
 
+using namespace VORONOI;
+using namespace GEOM;
+
 HalfEdge::HalfEdge(Edge* e, Site* lSite, Site* rSite) {
 	site = lSite;
 	edge = e;

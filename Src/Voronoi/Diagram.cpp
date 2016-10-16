@@ -6,6 +6,9 @@
 using std::cout;
 using std::endl;
 
+using namespace GEOM;
+using namespace VORONOI;
+
 Point2* Diagram::createVertex(double x, double y) {
 	Point2* vert = vertexPool.newElement(Point2(x, y));
 	tmpVertices.insert(vert);

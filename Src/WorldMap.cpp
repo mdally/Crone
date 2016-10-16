@@ -6,6 +6,9 @@
 #include "EarClipping.h"
 #include "Geometry.h"
 
+using namespace GEOM;
+using namespace VORONOI;
+
 bool sitesOrdered(const Point2& s1, const Point2& s2) {
 	if (s1.y < s2.y)
 		return true;
@@ -43,10 +46,10 @@ WorldMap::~WorldMap() {
 	if (diagram) delete diagram;
 }
 
-void WorldMap::generate(uint32_t seed) {
+void WorldMap::generate(uint32_t seed, bool makeNoisyEdges) {
 	std::vector<Point2> sites;
 	BoundingBox bbox;
-	uint32_t dimension = 5000;
+	uint32_t dimension = 10000;
 	uint32_t siteCount = 30000;
 	genRandomSites(sites, bbox, dimension, siteCount, seed);
 
@@ -58,9 +61,7 @@ void WorldMap::generate(uint32_t seed) {
 		delete old;
 	}
 
-#define useNoisyEdges 1
-#if useNoisyEdges
-	genNoisyEdges();
+	if(makeNoisyEdges) genNoisyEdges();
 
 	//perform ear clipping to generate non-intersecting triangles that completely cover each cell
 	std::vector<GLfloat> verts;
@@ -72,57 +73,6 @@ void WorldMap::generate(uint32_t seed) {
 
 	terrainVertIndices = triData.idxs;
 	nTerrainTris = triData.nTris;
-
-#else
-	nTerrainVerts = 0;
-	nTerrainVertIndices = 0;
-	for (Cell* c : diagram->cells) {
-		nTerrainVerts += c->halfEdges.size() + 1;
-		nTerrainVertIndices += c->halfEdges.size();
-	}
-	terrainVerts = (GLfloat*)malloc(sizeof(GLfloat) * nTerrainVerts * 6);
-	terrainVertIndices = (GLuint*)malloc(sizeof(GLuint) * nTerrainVertIndices * 3);
-
-	srand(0);
-	GLuint vertCount = 0;
-	GLuint vertIdxCount = 0;
-	for (Cell* c : diagram->cells) {
-		float r = rand() / (float)RAND_MAX;
-		float g = rand() / (float)RAND_MAX;
-		float b = rand() / (float)RAND_MAX;
-
-		Point2& site = c->site.p;
-
-		terrainVerts[vertCount * 6 + 0] = (float)site.x;
-		terrainVerts[vertCount * 6 + 1] = 0.0;
-		terrainVerts[vertCount * 6 + 2] = -((float)dimension - (float)site.y);
-		terrainVerts[vertCount * 6 + 3] = r;
-		terrainVerts[vertCount * 6 + 4] = g;
-		terrainVerts[vertCount * 6 + 5] = b;
-
-		GLuint cellCenterIdx = vertCount++;
-
-		for (HalfEdge* he : c->halfEdges) {
-			Point2& vert = *(he->startPoint());
-
-			terrainVerts[vertCount * 6 + 0] = (float)vert.x;
-			terrainVerts[vertCount * 6 + 1] = 0.0;
-			terrainVerts[vertCount * 6 + 2] = -((float)dimension - (float)vert.y);
-			terrainVerts[vertCount * 6 + 3] = r;
-			terrainVerts[vertCount * 6 + 4] = g;
-			terrainVerts[vertCount * 6 + 5] = b;
-
-			++vertCount;
-		}
-
-		uint32_t nEdges = c->halfEdges.size();
-		for (uint32_t i = 1; i <= nEdges; ++i) {
-			terrainVertIndices[vertIdxCount++] = cellCenterIdx;
-			terrainVertIndices[vertIdxCount++] = cellCenterIdx + i;
-			terrainVertIndices[vertIdxCount++] = cellCenterIdx + (i % nEdges) + 1;
-		}
-	}
-#endif
 
 	delete diagram;
 	diagram = nullptr;
@@ -143,13 +93,26 @@ void WorldMap::genNoisyEdges() {
 			Point2 d1 = e->rSite->p;
 			Point2 mid = lerp(v0, v1, 0.5);
 
-			//project the delaunay verts closer to the edge midpoint if the delaunay edge doesn't intersect the voronoi edge
+			//project the delaunay verts closer to the voronoi edge midpoint if the delaunay edge doesn't intersect the voronoi edge
 			if (!LineSegmentsIntersect(v0, v1, d0, d1)) {
 				Point2 targetVert = (d0.distanceToSquared(v0) < d0.distanceToSquared(v1) ? v0 : v1);
 				Vector2 delaunayEdge = d1 - d0;
 
 				FindLineSegmentIntersection(mid, d0, targetVert, targetVert - 0.5*delaunayEdge, d0);
 				FindLineSegmentIntersection(mid, d1, targetVert, targetVert + 0.5*delaunayEdge, d1);
+			}
+			//project the delaunay verts closer to voronoi edge midpoint if the distance is greater than twice the length of the voronoi edge
+			#define voronoiDelaunayMultiplier 1
+			if ((v1 - v0).lengthSquared()*voronoiDelaunayMultiplier < (d0 - mid).lengthSquared()) {
+				double voronoiEdgeLength = (v1 - v0).length();
+
+				Vector2 tmp = d0 - mid;
+				tmp.normalize();
+				d0 = mid + voronoiDelaunayMultiplier*voronoiEdgeLength*tmp;
+
+				tmp = d1 - mid;
+				tmp.normalize();
+				d1 = mid + voronoiDelaunayMultiplier*voronoiEdgeLength*tmp;
 			}
 
 			double tradeoff = 0.5;

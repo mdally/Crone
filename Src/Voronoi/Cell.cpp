@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <limits>
 
+using namespace VORONOI;
+using namespace GEOM;
+
 std::vector<Cell*> Cell::getNeighbors() {
 	std::vector<Cell*> neighbors;
 	Edge* e;
