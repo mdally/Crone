@@ -59,7 +59,7 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 
 	for (Cell* c : diagram->cells) {
 		float r, g, b;
-#define DO_OCEANS 1
+#define DO_OCEANS 0
 #if DO_OCEANS
 		bool ocean = (rand() / (double)RAND_MAX)>0.5;
 		for (HalfEdge* he : c->halfEdges) {

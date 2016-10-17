@@ -13,10 +13,12 @@ CroneGame::CroneGame(){
 
 	glEnable(GL_DEPTH_TEST);
 
-	//wireframe
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//filled
+#define WIREFRAME 0
+#if WIREFRAME
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#else
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
 
 	map.generate(5, true);
 
