@@ -86,7 +86,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32_$(Configuration).lib;glfw3_$(Configuration).lib;SOIL_$(Configuration).lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libnoise.lib;glew32_$(Configuration).lib;glfw3_$(Configuration).lib;SOIL_$(Configuration).lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(ProjectDir)$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
@@ -109,7 +109,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glew32_$(Configuration).lib;glfw3_$(Configuration).lib;SOIL_$(Configuration).lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libnoise.lib;glew32_$(Configuration).lib;glfw3_$(Configuration).lib;SOIL_$(Configuration).lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(ProjectDir)$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
       <LinkTimeCodeGeneration />
     </Link>
@@ -133,6 +133,7 @@
     <ClInclude Include="..\..\Src\EarClipping.h" />
     <ClInclude Include="..\..\Src\Game.h" />
     <ClInclude Include="..\..\Src\Geometry.h" />
+    <ClInclude Include="..\..\Src\SimplexNoise\SimplexNoise.h" />
     <ClInclude Include="..\..\Src\WorldMap.h" />
     <ClInclude Include="..\..\Src\Platform.h" />
     <ClInclude Include="..\..\Src\Shader.h" />
@@ -151,6 +152,7 @@
     <ClCompile Include="..\..\Src\Camera.cpp" />
     <ClCompile Include="..\..\Src\EarClipping.cpp" />
     <ClCompile Include="..\..\Src\Game.cpp" />
+    <ClCompile Include="..\..\Src\SimplexNoise\SimplexNoise.cpp" />
     <ClCompile Include="..\..\Src\WorldMap.cpp" />
     <ClCompile Include="..\..\Src\Platform.cpp" />
     <ClCompile Include="..\..\Src\Shader.cpp" />
