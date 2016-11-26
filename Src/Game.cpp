@@ -13,14 +13,14 @@ CroneGame::CroneGame(){
 
 	glEnable(GL_DEPTH_TEST);
 
-#define WIREFRAME 0
+#define WIREFRAME 1
 #if WIREFRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #else
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
 
-	map.generate(5, false);
+	map.generate(5);
 
 	terrainFloor = Shader("terrainFloor.vert", nullptr, "terrainFloor.frag");
 

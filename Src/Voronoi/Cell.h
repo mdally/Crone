@@ -2,6 +2,7 @@
 #define _CELL_H_
 
 #include "Point2.h"
+#include "../Biome.h"
 #include <vector>
 
 namespace VORONOI {
@@ -29,9 +30,11 @@ namespace VORONOI {
 		Site site;
 		std::vector<HalfEdge*> halfEdges;
 		bool closeMe;
+		BiomeType biome;
+		float height;
 
-		Cell() : closeMe(false) {};
-		Cell(GEOM::Point2 _site) : site(_site, this), closeMe(false) {};
+		Cell() : closeMe(false), biome(OCEAN) {};
+		Cell(GEOM::Point2 _site) : site(_site, this), closeMe(false), biome(OCEAN) {};
 
 		std::vector<Cell*> getNeighbors();
 		cellBoundingBox getBoundingBox();

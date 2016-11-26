@@ -4,3 +4,10 @@ Logs/
 *.tlog
 *.idb
 Screenshots/
+*.pdb
+*.exe
+*.obj
+*.log
+*.opensdf
+*.suo
+*.ilk

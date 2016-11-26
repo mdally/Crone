@@ -2,9 +2,11 @@
 #include "Voronoi\VoronoiDiagramGenerator.h"
 #include <ctime>
 #include <utility>
+#include <algorithm>
 #include "DLList.h"
 #include "EarClipping.h"
 #include "Geometry.h"
+#include <limits>
 
 using namespace GEOM;
 using namespace VORONOI;
@@ -46,11 +48,14 @@ WorldMap::~WorldMap() {
 	if (diagram) delete diagram;
 }
 
-void WorldMap::generate(uint32_t seed, bool makeNoisyEdges) {
+void WorldMap::generate(uint32_t seed) {
 	std::vector<Point2> sites;
 	BoundingBox bbox;
-	uint32_t dimension = 10000;
-	uint32_t siteCount = 30000;
+
+	double sitePerUnitArea = 500 / (double)(2000 * 2000);
+
+	dimension = 3000;
+	siteCount = (uint32_t)(dimension * dimension * sitePerUnitArea);
 	genRandomSites(sites, bbox, dimension, siteCount, seed);
 
 	VoronoiDiagramGenerator vdg;
@@ -61,7 +66,10 @@ void WorldMap::generate(uint32_t seed, bool makeNoisyEdges) {
 		delete old;
 	}
 
-	if(makeNoisyEdges) genNoisyEdges();
+	//divide land/water
+	pickLandWater();
+
+	genNoisyEdges();
 
 	//perform ear clipping to generate non-intersecting triangles that completely cover each cell
 	std::vector<GLfloat> verts;
@@ -78,12 +86,61 @@ void WorldMap::generate(uint32_t seed, bool makeNoisyEdges) {
 	diagram = nullptr;
 }
 
+void WorldMap::pickLandWater() {
+	float mult = 5.0f / (float)dimension;
+	float distMod;
+	float noise;
+	float out;
+
+	Point2 center = Point2(dimension/2.0, dimension/2.0);
+
+	std::vector<Point2> centers;
+	centers.push_back(Point2(dimension*(1 / 4.0), dimension*(1 / 4.0)));
+	centers.push_back(Point2(dimension*(1 / 4.0), dimension*(3 / 4.0)));
+	centers.push_back(Point2(dimension*(3 / 4.0), dimension*(1 / 4.0)));
+	centers.push_back(Point2(dimension*(3 / 4.0), dimension*(3 / 4.0)));
+
+
+	for (Cell* c : diagram->cells) {
+		uint32_t nPoints = 0;
+		noise = 0.0f;
+
+		for (HalfEdge* he : c->halfEdges) {
+			++nPoints;
+
+			noise += (1.0f+simplex.fractal(5, (float)(he->startPoint()->x*mult), (float)(he->startPoint()->y*mult)))/2.0f;
+		}
+		noise /= nPoints;
+
+		distMod = std::numeric_limits<float>::max();
+		for (Point2& p : centers) {
+			float dist = (float)p.distanceTo(c->site.p);
+
+			if (dist < distMod)
+				distMod = dist;
+		}
+
+		distMod = 1.0f - (distMod / (dimension/4.0f));
+		if (distMod < 0.0f) distMod = 0.0f;
+
+		out = 0.0f + distMod*0.4f + 0.6f*noise;
+
+		if (out > 0.5) {
+			c->biome = LAND;
+		}
+		c->height = out;
+	}
+}
+
 void WorldMap::genNoisyEdges() {
 	if (!diagram) return;
 	srand(0);
 
 	for (Edge* e : diagram->edges) {
-		if (e->lSite && e->rSite) {
+		if (e->lSite && e->rSite && (e->lSite->cell->biome != e->rSite->cell->biome)) {
+			if (e->lSite->cell == diagram->cells[4] || e->rSite->cell == diagram->cells[4])
+				int i = 0;
+
 			std::vector<Point2> path1;
 			std::vector<Point2> path2;
 
@@ -146,12 +203,12 @@ void WorldMap::genNoisyEdges() {
 
 			//copy verts to memory pool
 			size_t nVerts = path1.size();
-			Point2* vertArray = noisyVerts.allocContiguousArray(nVerts);
+			Point2* vertArray = noisyVerts.allocContiguousArray(nVerts, Point2());
 			size_t idx = 0;
 			for (Point2& p : path1) {
 				vertArray[idx++] = p;
 			}
-			e->nNoisyVerts = nVerts;
+			e->nNoisyVerts = (uint32_t)nVerts;
 			e->noisyVerts = vertArray;
 		}
 	}

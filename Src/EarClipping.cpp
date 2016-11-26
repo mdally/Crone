@@ -1,5 +1,4 @@
 #include "EarClipping.h"
-#include "SimplexNoise\SimplexNoise.h"
 #include <GLEW/glew.h>
 #include <vector>
 #include <list>
@@ -12,12 +11,11 @@ typedef std::pair<Point2,Point2> lineSegment;
 
 struct PolygonVert {
 	Point2 vert;
-	float height;
 	int32_t idx;
 	double angle;
 	bool isValidEar;
 
-	PolygonVert(Point2 p, float _height = 0) : vert(p), height(_height > 0.5f ? 1.0f : 0.0f), idx(-1), angle(0.0), isValidEar(false) {};
+	PolygonVert(Point2 p) : vert(p), idx(-1), angle(0.0), isValidEar(false) {};
 
 	inline bool isConvex() { return angle < M_PI; };
 	inline bool isReflex() { return angle >= M_PI; };
@@ -61,8 +59,7 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 
 	for (Cell* c : diagram->cells) {
 		float r, g, b;
-#define DO_OCEANS 1
-#if DO_OCEANS
+#if 1 //blue vs green
 		bool ocean = (rand() / (double)RAND_MAX)>0.5;
 		for (HalfEdge* he : c->halfEdges) {
 			if (he->edge->lSite == nullptr || he->edge->rSite == nullptr) {
@@ -71,37 +68,30 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 			}
 		}
 
-		switch (ocean) {
-			case true: {
+		switch (c->biome) {
+			case OCEAN: {
 				r = 0.0f;
 				g = 0.0f;
 				b = 1.0f;
 			} break;
-			case false: {
+			case LAND: {
 				r = 0.0f;
 				g = 1.0f;
 				b = 0.0f;
 			} break;
 		}
-#else
+#elif 0 //noise value
+		float height = (c->height < 0.5f ? 0.0f : 1.0f);
+		r = height;
+		g = height;
+		b = height;
+#elif 0 // pure random
 		r = rand() / (float)RAND_MAX;
 		g = rand() / (float)RAND_MAX;
 		b = rand() / (float)RAND_MAX;
 #endif
-		float mult = 2.0f/10000.0f;
-		float distMod;
-		float noise;
-		float out;
-		Point2 center = Point2(5000, 5000);
 		//add all the cell's noisy verts in order to a doubly linked list
 		for (HalfEdge* he : c->halfEdges) {
-			distMod = (float)center.distanceTo(c->site.p);
-			distMod = 1.0f-(distMod /5000.0f);
-			if (distMod < 0.0f) distMod = 0.0f;
-			noise = (1.0f + SimplexNoise::noise((float)c->site.p.x*mult, (float)c->site.p.y*mult)) / 2.0f;
-
-			out = 0.2f + distMod*0.4f + 0.3f*noise;
-
 			Point2* noisyVerts = he->edge->noisyVerts;
 			if (noisyVerts) {
 				bool reverse = *(he->startPoint()) != noisyVerts[0];
@@ -111,11 +101,11 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 					uint32_t idx = (reverse ? nNoisyVerts - i : i);
 					Point2 site = noisyVerts[idx];
 
-					allVerts.addToTail(PolygonVert(site, out));
+					allVerts.addToTail(PolygonVert(site));
 				}
 			}
 			else {
-				allVerts.addToTail(PolygonVert(*he->startPoint(), out));
+				allVerts.addToTail(PolygonVert(*he->startPoint()));
 			}
 		}
 
@@ -149,55 +139,42 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 			}
 
 			Point2* p;
-			float height;
 			//output the ear that is being clipped
 			if (prev->data.idx == -1) {
 				prev->data.idx = idxCounter++;
 
 				p = &prev->data.vert;
-				height = prev->data.height;
 
 				*(currentVert++) = (float)(*p).x;
-				*(currentVert++) = 0.0f;//height * 100;
+				*(currentVert++) = 0.0f;
 				*(currentVert++) = -((float)dimension - (float)(*p).y);
-				*(currentVert++) = height;
-				*(currentVert++) = height;
-				*(currentVert++) = height;
-				/**(currentVert++) = r;
+				*(currentVert++) = r;
 				*(currentVert++) = g;
-				*(currentVert++) = b;*/
+				*(currentVert++) = b;
 			}
 			if (earVert->data.idx == -1) {
 				earVert->data.idx = idxCounter++;
 
 				p = &earVert->data.vert;
-				height = earVert->data.height;
 
 				*(currentVert++) = (float)(*p).x;
-				*(currentVert++) = 0.0f;//height * 100;
+				*(currentVert++) = 0.0f;
 				*(currentVert++) = -((float)dimension - (float)(*p).y);
-				*(currentVert++) = height;
-				*(currentVert++) = height;
-				*(currentVert++) = height;
-				/**(currentVert++) = r;
+				*(currentVert++) = r;
 				*(currentVert++) = g;
-				*(currentVert++) = b;*/
+				*(currentVert++) = b;
 			}
 			if (next->data.idx == -1) {
 				next->data.idx = idxCounter++;
 
 				p = &next->data.vert;
-				height = next->data.height;
 
 				*(currentVert++) = (float)(*p).x;
-				*(currentVert++) = 0.0f;//height*100;
+				*(currentVert++) = 0.0f;
 				*(currentVert++) = -((float)dimension - (float)(*p).y);
-				*(currentVert++) = height;
-				*(currentVert++) = height;
-				*(currentVert++) = height;
-				/**(currentVert++) = r;
+				*(currentVert++) = r;
 				*(currentVert++) = g;
-				*(currentVert++) = b;*/
+				*(currentVert++) = b;
 			}
 
 			*(currentIdx++) = prev->data.idx;

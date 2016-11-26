@@ -50,22 +50,28 @@ void Camera::move(userInput* inputs, GLfloat dt){
 		tmp = { right.x, 0, right.z };
 		moveDirection += glm::normalize(tmp);
 	}
-	if (inputs->keyboard[GLFW_KEY_KP_ENTER]) {
+	if (inputs->keyboard[GLFW_KEY_KP_ENTER] || inputs->keyboard[GLFW_KEY_0]) {
 		//reset move speed
 		moveSpeed = minMoveSpeed;
 		scrollSpeed = minScrollSpeed;
 	}
-	if (inputs->keyboard[GLFW_KEY_KP_ADD]) {
+	if (inputs->keyboard[GLFW_KEY_KP_ADD] || inputs->keyboard[GLFW_KEY_EQUAL]) {
 		//increase move speed
 		moveSpeed *= 1.1f;
 		scrollSpeed *= 1.1f;
 	}
-	if (inputs->keyboard[GLFW_KEY_KP_SUBTRACT]) {
+	if (inputs->keyboard[GLFW_KEY_KP_SUBTRACT] || inputs->keyboard[GLFW_KEY_MINUS]) {
 		//decrease move speed
 		moveSpeed /= 1.1f;
 		scrollSpeed /= 1.1f;
 		if (moveSpeed < minMoveSpeed) moveSpeed = minMoveSpeed;
 		if (scrollSpeed < minScrollSpeed) scrollSpeed = minScrollSpeed;
+	}
+	if (inputs->keyboard[GLFW_KEY_PAGE_UP]) {
+		zoomOut -= scrollSpeed/100.0f;
+	}
+	if (inputs->keyboard[GLFW_KEY_PAGE_DOWN]) {
+		zoomOut += scrollSpeed/100.0f;
 	}
 
 	if (moveDirection.x != 0 || moveDirection.y != 0 || moveDirection.z != 0)
