@@ -88,17 +88,18 @@ void WorldMap::generate(uint32_t seed) {
 
 void WorldMap::pickLandWater() {
 	float mult = 5.0f / (float)dimension;
-	float distMod;
 	float noise;
 	float out;
 
 	Point2 center = Point2(dimension/2.0, dimension/2.0);
 
-	std::vector<Point2> centers;
-	centers.push_back(Point2(dimension*(1 / 4.0), dimension*(1 / 4.0)));
-	centers.push_back(Point2(dimension*(1 / 4.0), dimension*(3 / 4.0)));
-	centers.push_back(Point2(dimension*(3 / 4.0), dimension*(1 / 4.0)));
-	centers.push_back(Point2(dimension*(3 / 4.0), dimension*(3 / 4.0)));
+	std::vector<Point2> square = {
+		Point2(dimension*(1.0 / 4.0), dimension*(1.0 / 4.0)),
+		Point2(dimension*(3.0 / 4.0), dimension*(1.0 / 4.0)),
+		Point2(dimension*(3.0 / 4.0), dimension*(3.0 / 4.0)),
+		Point2(dimension*(1.0 / 4.0), dimension*(3.0 / 4.0))
+	};
+	std::vector<std::vector<Point2>> centers = { square };
 
 
 	for (Cell* c : diagram->cells) {
@@ -112,18 +113,12 @@ void WorldMap::pickLandWater() {
 		}
 		noise /= nPoints;
 
-		distMod = std::numeric_limits<float>::max();
-		for (Point2& p : centers) {
-			float dist = (float)p.distanceTo(c->site.p);
-
-			if (dist < distMod)
-				distMod = dist;
+		bool inside = false;
+		for (std::vector<Point2>& polygon : centers) {
+			inside = inside | PointInPolygon(c->site.p, polygon);
 		}
 
-		distMod = 1.0f - (distMod / (dimension/4.0f));
-		if (distMod < 0.0f) distMod = 0.0f;
-
-		out = 0.0f + distMod*0.4f + 0.6f*noise;
+		out = 0.0f + (inside ? 0.2f : 0.0f) + 0.8f*noise;
 
 		if (out > 0.5) {
 			c->biome = LAND;

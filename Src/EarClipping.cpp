@@ -81,7 +81,7 @@ openGL_TriData performEarClipping(Diagram* diagram, int dimension) {
 			} break;
 		}
 #elif 0 //noise value
-		float height = (c->height < 0.5f ? 0.0f : 1.0f);
+		float height = (c->height/* < 0.5f ? 0.0f : 1.0f*/);
 		r = height;
 		g = height;
 		b = height;
